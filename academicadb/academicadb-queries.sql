@@ -61,3 +61,40 @@ select * from (select nomestudiante, sexestudiante, nommateria, nfinal,case
 		estado='R') as t1
 where tipo_estrato='BAJO'
 order by t1.nfinal;
+--------------
+-- Visualizar los estudiantes de bases de datos que obtuvieron
+-- una nota buena, ordenados por nota final descendente.
+-- la notas son:
+-- 5-      EXCELENTE
+-- 4 - 4.9 BUENA
+-- 3 - 3.9 REGULAR
+-- 2 - 2.9 MALA
+-- < 2     PESIMA
+-------
+-- Obtenemos el select interno con la clasificacion de notas.
+select nomestudiante,nommateria,nfinal,case 
+	when nfinal=5.0 then 'EXCELENTE'
+	when nfinal between 4.0 and 4.9 then 'BUENO'
+	when nfinal between 3.0 and 3.9 then 'REGULAR'
+	when nfinal between 2.0 and 2.9 then 'MALA'
+	else 'PESIMA'
+	end as nota_cuali
+from estudiantes join regnotas on codestudiante=estudiante
+	join materias on materia=codmateria
+where nommateria like('%ase%ato%')
+order by nfinal;
+-------
+-- Creamos la tabla virtual utilizando select anidados, donde en el select interno
+-- insertamos la consulta categorizada anteriormente.
+select * from (select nomestudiante,nommateria,nfinal,case 
+		when nfinal=5.0 then 'EXCELENTE'
+		when nfinal between 4.0 and 4.9 then 'BUENO'
+		when nfinal between 3.0 and 3.9 then 'REGULAR'
+		when nfinal between 2.0 and 2.9 then 'MALA'
+		else 'PESIMA'
+		end as nota_cuali
+	from estudiantes join regnotas on codestudiante=estudiante
+		join materias on materia=codmateria
+	where nommateria like('%ase%ato%')) as t1
+where t1.nota_cuali='BUENO'
+order by t1.nfinal;
