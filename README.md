@@ -5,8 +5,6 @@
 
 ## Proceso de Normalización
 
-### Clase 1: 4/sep/2019
-
 La normalizacion es un proceso de refinamiento por anomalias de diseño por la no deteccion en el momento de diseño, que puede ser por insercion, modificacion,
 el __Objetivo__ es eliminar estas anomalis que se presentan, para esto necesitamos saber los atributos de esa relacion, de quien estan dependiendo.
 
@@ -43,7 +41,16 @@ Se utiliz el pricipio __divide y venceras__, que consiste en dividir de acuerdo 
 
 Son reglas o estado en la cual debe tener una realcion para que se encuentre en una forma normal. Existen las siguentes formas normales:
 
-* __1FN__: Una relacion esta en primera forma normal si es una relación y atributos atomicos, y para cumplir esta forma se debe eliminar la no atomisidad o convertir ese atributo no atomico como llave compuesta con le primary key. 
+* __1FN__: Una relacion esta en primera forma normal si es una relación y atributos atomicos, y para cumplir esta forma se debe eliminar la no atomisidad o convertir ese atributo no atomico como llave compuesta con le primary key.
 * __2FN__: Para que una relacion debe estan en _1FN_ y que todos los atributos deben depender totalmente de la llave primaria. Toda relacion que tiene una llave primaria sencilla ya se encuentra en _2FN_, pero cunado hay llaves primarias compuestas puede que la dependencia sea parcial
 * __3FN__:  Debe etar en segunda forma normal, ademas no tiene __dependencias transitivas__, si a=b y b=c entones a=c, y para solucionar eliminamos la dependencias transitiva.
 * __BCFN (Boyce-Codd Forma Normal)__: En algunos casos llamada 4FN, una realacion esta en esta forma si esta en 3FN y todos los determinante son llave primaria o llave candidata
+* __4FN__:
+* __5FN__:
+
+> NOTA: Proyecto final normalización base de datos icfes pruebas saber pro. grupos de maximo 3 personas, Revisar documentos almacenados en la nube.
+
+## Condicionales multiples: WHEN ... END
+
+Permite obtener nuevos atributos basados en otros que cumple unas condiciones determinadas. Permite el manejo de mltiples operaciones.
+En el momento de realizar una condicion __WHERE__, no podemos utilizar el atributo generado por medio del __WHEN ... END__ puesto que este atributo creado no esta materializado en la base de dato. Para solucionar este tipo de inconvenientes debemos crear una tabla virtual, en pocas palabras realizar selects internos renombrandolo con __AS__, de esta forma podremos acceder a este atributo creado.
