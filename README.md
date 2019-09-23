@@ -54,3 +54,14 @@ Son reglas o estado en la cual debe tener una realcion para que se encuentre en 
 
 Permite obtener nuevos atributos basados en otros que cumple unas condiciones determinadas. Permite el manejo de mltiples operaciones.
 En el momento de realizar una condicion __WHERE__, no podemos utilizar el atributo generado por medio del __WHEN ... END__ puesto que este atributo creado no esta materializado en la base de dato. Para solucionar este tipo de inconvenientes debemos crear una tabla virtual, en pocas palabras realizar selects internos renombrandolo con __AS__, de esta forma podremos acceder a este atributo creado.
+
+## Funciones Agregadas
+
+Son funciones muy utilizadas para la estadistica, que nos permite realizar conteos, promedio, maximos, minimos  a partir de la base de datos. Estas funciones van solas en la claudaula SELECT, no la acompaña ningun atributo.
+
+* __count(*)__: Cuenta el numero de regiatros de tuplas que cumplen una condicion determinada, incluyendo los valores NULL.
+* __count(\<attribute>)__: Es similar al count anterior pero no cuenta los valores NULL.
+* __sum(\<attribute>)__: totaliza los valore numericos de un atributo.
+* __avg(\<attribute>)__: Obtiene el valor promedio del atributo numerico.
+* __max(\<attribute>)__: Obtiene el valor maximo del atributo numerico.
+* __min(\<attribute>)__: Obtiene el valor minimo del atributo numerico.

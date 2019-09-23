@@ -165,4 +165,83 @@ from (
 			t2.nommateria like '%oftware%'
 ) as t3
 where region='PASIFICA'
-order by t3.nomciudad; 
+order by t3.nomciudad;
+--============================================
+-- FUNCIONES AGREGADAS
+-- ===========================================
+--------------------
+-- COUNT(<attribute>)
+--------------------
+-- Visualizar el numero total de estudiantes
+select count(*) as numest
+from estudiantes;
+------
+-- visualizar el numero total de estudiantes del programa de ingenieria de sistemas.
+select count(*) as estsistemas
+from estudiantes join programas on programa=codprograma
+where nomprograma like('%istem%');
+------
+-- visualizar el numero de estudiantes que reprobaron bases de datos
+select 'Reprobados db' as detalle, count(*) as numero
+from estudiantes join regnotas on codestudiante=estudiante join materias on materia=codmateria
+where nommateria like('%ase%ato%') and estado='R';
+
+-- Visualizar el porcentaje de estudiantes de la ciudad de pasto.
+-- 1- calcular el numero total de estudiantes
+select count(*) as pastusos
+from estudiantes join ciudades on ciudad=codciudad;
+-- 2- Calcular el numero de estudiantes pastusos.
+select count(*) as pastusos
+from estudiantes join ciudades on ciudad=codciudad
+where nomciudad like('%asto%');
+-- 3- calcular el porcentaje 
+select (select count(*)
+	from estudiantes join ciudades on ciudad=codciudad
+	where nomciudad like('%asto%'))*100/
+	(select count(*)
+	from estudiantes join ciudades on ciudad=codciudad) 
+as porcentaje_pastusos;
+------
+-- visualizar el numero de hombres y el numero de mujeres de la facultad de ingenieria.
+select 'Hombres' as sexo, count(*) as numero
+from estudiantes join programas on programa=codprograma
+	join facultades on facultad=codfacultad
+where nomfacultad like '%genier%' and
+	sexestudiante='M'
+union
+select 'Mujeres' as sexo, count(*) as numero
+from estudiantes join programas on programa=codprograma
+	join facultades on facultad=codfacultad
+where nomfacultad like '%genier%' and
+	sexestudiante='F'
+order by 1 desc;
+-- vosualizar el numero de mujeres y el numero de hombres que 
+-- matricularon bases de datos con su respectivo porcentaje
+-- ordenado por el mayor porcentaje
+select 'Hombres' as sexo, count(*) as numero, (select (select count(*)
+	from estudiantes join regnotas on codestudiante=estudiante join materias on materia=codmateria
+	where nommateria like('%ase%atos%') and sexestudiante='M')*100/
+	(select count(*)
+	from estudiantes join regnotas on codestudiante=estudiante join materias on materia=codmateria
+	where nommateria like('%ase%atos%')) 
+as porcentaje)
+from estudiantes join regnotas on codestudiante=estudiante join materias on materia=codmateria
+where nommateria like('%ase%atos%') and
+	sexestudiante='M'
+union
+select 'Mujeres' as sexo, count(*) as numero, (select (select count(*)
+	from estudiantes join regnotas on codestudiante=estudiante join materias on materia=codmateria
+	where nommateria like('%ase%atos%') and sexestudiante='F')*100/
+	(select count(*)
+	from estudiantes join regnotas on codestudiante=estudiante join materias on materia=codmateria
+	where nommateria like('%ase%atos%')) 
+as porcentaje)
+from estudiantes join regnotas on codestudiante=estudiante join materias on materia=codmateria
+where nommateria like('%ase%atos%') and
+	sexestudiante='F'
+order by 3 desc;
+-----
+-- 
+--------------------
+-- AVG(<attributes>)
+--------------------
