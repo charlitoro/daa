@@ -304,7 +304,7 @@ order by sum_age;
 ----
 -- visualizar el numero de estudiantes del programa de 
 -- ingenieria de sistemas  y el numero de estudiantes
--- de ingenieria electronica que matricularon based de datos y totalizar
+-- de ingenieria Agroforestal que matricularon based de datos y totalizar
 select 'Ing Sistemas' as programa, count(nomestudiante) as num
 from estudiantes join regnotas on codestudiante=estudiante 
 	join materias on materia=codmateria
@@ -315,7 +315,7 @@ select 'Ing Electronica' as programa, count(nomestudiante) as num
 from estudiantes join regnotas on codestudiante=estudiante 
 	join materias on materia=codmateria
 	join programas on programa=codprograma
-where nomprograma like('%lectro%') and nommateria like('%ase%atos%')
+where nomprograma like('%groforest%') and nommateria like('%ase%atos%')
 union
 select 'All' as programa, sum(t1.num)
 from (select 'Ing Sistemas' as programa, count(nomestudiante) as num
@@ -324,9 +324,9 @@ from (select 'Ing Sistemas' as programa, count(nomestudiante) as num
 		join programas on programa=codprograma
 	where nomprograma like('%istemas%') and nommateria like('%ase%atos%')
 	union
-	select 'Ing Electronica' as programa, count(nomestudiante) as num
+	select 'Ing Agroforestal' as programa, count(nomestudiante) as num
 	from estudiantes join regnotas on codestudiante=estudiante 
 		join materias on materia=codmateria
 		join programas on programa=codprograma
-	where nomprograma like('%lectro%') and nommateria like('%ase%atos%')) as t1
+	where nomprograma like('%groforest%') and nommateria like('%ase%atos%')) as t1
 order by 2;
