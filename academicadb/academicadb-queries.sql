@@ -105,12 +105,12 @@ order by t1.nfinal;
 -- las materias ingenieria de software y programacion orientada a objetos
 -- ordenados por ciudad.
 -- Las regiones pasificas son:
---   ATLANTICA: Atlántico, Bolivar, Cesar, Cordoba, Guajira, Magdalena, San Andrés y Sucre.
+--   ATLANTICA: Atlï¿½ntico, Bolivar, Cesar, Cordoba, Guajira, Magdalena, San Andrï¿½s y Sucre.
 --   ORINOQUIA: Amazonas, Arauca, Casanare, Guainia, Guaviare, Putumayo, Vaupes, y Vichada
---   ORIENTE: Boyacá, Cundinamarca, Norete de Santander, Santander, y Meta
+--   ORIENTE: Boyacï¿½, Cundinamarca, Norete de Santander, Santander, y Meta
 --   CENTRAL: Caldaas, Risaralda, Quindio, Huila, Tolima y Caqueta
---   PACIFICA: Cauca, Choco, Nariño, y Valle del Cauca
---   BOGOTA: Bogotá
+--   PACIFICA: Cauca, Choco, Nariï¿½o, y Valle del Cauca
+--   BOGOTA: Bogotï¿½
 --   ANTIOQUIA: Antioquia
 
 --Solucion Charlie
@@ -241,7 +241,92 @@ where nommateria like('%ase%atos%') and
 	sexestudiante='F'
 order by 3 desc;
 -----
+-- count(<att>): no cuenta los valores nulos del atributo
+insert into estudiantes (codestudiante,nomestudiante,barrio,ciudad,programa)
+	values('4000','Alejandro Useche','101','52001','01');
+-----
+-- VIsualizar cuantos estudiantes de la ciudad de Pasto hay
+ select count(sexestudiante) as men_pasto 
+ from estudiantes join ciudades on ciudad=codciudad
+ where nomciudad like('%asto%');
+/*
+ * Anterior a este ejemplo de inserto un estudiante sin su sexo, y al realizar el count(*) cuanta todos los estudiantes
+ * en este caso 57 estudiantes de pasto, pero al realizar count(<attribute>) no cuenta los valores nulos encontrados en esa
+ * columna, que para este ejemplo de busco por sexo del estudiante y se obtubo 56.
+ */
+----
+-- count(distinct <attribute>) cuantos valores distintos hay en ese atrobuto
+-- visualizar de cuantas doferentes ciudades provienen los estudiantes
+select count(distinct codciudad) 
+from ciudades join estudiantes on codciudad=ciudad;
+-- visualizar los valores distintos de sexo
+select count(distinct sexestudiante)
+from estudiantes;
+-- visualizar los valores distintos en la edad
+select count(distinct edaestudiante)
+from estudiantes;
 -- 
---------------------
--- AVG(<attributes>)
---------------------
+------------
+-- SUM(attibute): obtener totales
+------------
+-- visualizar la suma de las edades de las mujeres de pasto 
+-- y de los hombres por separado
+select 'Women' as sexo, sum(edaestudiante) as sum_age 
+from estudiantes join ciudades on ciudad=codciudad
+where sexestudiante='F' and nomciudad like('%asto%')
+union
+select 'Men' as sexo, sum(edaestudiante) as sum_age 
+from estudiantes join ciudades on ciudad=codciudad
+where sexestudiante='M' and nomciudad like('%asto%')
+union
+select 'All' as sexo, sum(edaestudiante) as sum_age 
+from estudiantes join ciudades on ciudad=codciudad
+where nomciudad like('%asto%')
+order by sum_age;
+--- 2 forma
+select 'Women' as sexo, sum(edaestudiante) as sum_age 
+from estudiantes join ciudades on ciudad=codciudad
+where sexestudiante='F' and nomciudad like('%asto%')
+	union
+select 'Men' as sexo, sum(edaestudiante) as sum_age 
+from estudiantes join ciudades on ciudad=codciudad
+where sexestudiante='M' and nomciudad like('%asto%')
+	union
+select 'All' as sexo, sum(t1.sum_age)
+from (select 'Women' as sexo, sum(edaestudiante) as sum_age 
+	from estudiantes join ciudades on ciudad=codciudad
+	where sexestudiante='F' and nomciudad like('%asto%')
+	union
+	select 'Men' as sexo, sum(edaestudiante) as sum_age 
+	from estudiantes join ciudades on ciudad=codciudad
+	where sexestudiante='M' and nomciudad like('%asto%')) as t1
+order by sum_age;
+----
+-- visualizar el numero de estudiantes del programa de 
+-- ingenieria de sistemas  y el numero de estudiantes
+-- de ingenieria electronica que matricularon based de datos y totalizar
+select 'Ing Sistemas' as programa, count(nomestudiante) as num
+from estudiantes join regnotas on codestudiante=estudiante 
+	join materias on materia=codmateria
+	join programas on programa=codprograma
+where nomprograma like('%istemas%') and nommateria like('%ase%atos%')
+union
+select 'Ing Electronica' as programa, count(nomestudiante) as num
+from estudiantes join regnotas on codestudiante=estudiante 
+	join materias on materia=codmateria
+	join programas on programa=codprograma
+where nomprograma like('%lectro%') and nommateria like('%ase%atos%')
+union
+select 'All' as programa, sum(t1.num)
+from (select 'Ing Sistemas' as programa, count(nomestudiante) as num
+	from estudiantes join regnotas on codestudiante=estudiante 
+		join materias on materia=codmateria
+		join programas on programa=codprograma
+	where nomprograma like('%istemas%') and nommateria like('%ase%atos%')
+	union
+	select 'Ing Electronica' as programa, count(nomestudiante) as num
+	from estudiantes join regnotas on codestudiante=estudiante 
+		join materias on materia=codmateria
+		join programas on programa=codprograma
+	where nomprograma like('%lectro%') and nommateria like('%ase%atos%')) as t1
+order by 2;
