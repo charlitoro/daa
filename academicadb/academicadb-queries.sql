@@ -330,3 +330,91 @@ from (select 'Ing Sistemas' as programa, count(nomestudiante) as num
 		join programas on programa=codprograma
 	where nomprograma like('%groforest%') and nommateria like('%ase%atos%')) as t1
 order by 2;
+----------------------------------
+--
+-- visualizar la nota promedio en la materia de bases de datos de los estudiantes
+-- de los estudiantes de ingenieria de sistemas
+select round(sum(nfinal)/count(*), 2) as npromedio
+from estudiantes join regnotas on codestudiante=estudiante
+		join materias on materia=codmateria 
+		join programas on programa=codprograma
+where nomprograma like '%istem%' and 
+	nommateria like '%ase%atos%';
+----------
+-- AVG(<attri>): Funcion que calcula el promedio de el valor del atrobuto
+----------
+-- visualizar la nota promedio en la materia de bases de datos de los estudiantes
+-- de los estudiantes de ingenieria de sistemas
+select round(avg(nfinal), 2) as npromedio
+from estudiantes join regnotas on codestudiante=estudiante
+		join materias on materia=codmateria 
+		join programas on programa=codprograma
+where nomprograma like '%istem%' and 
+	nommateria like '%ase%atos%';
+----
+-- visualizar el numero de mujeres y su edad promedio y de  igual manera
+-- el numero de honbres y su edad promedio de todos los estudiantes
+-- de la ciudad de Pasto y totalizar
+select 'Mujeres' as sexo, round(avg(edaestudiante)) as nedad
+from estudiantes join ciudades on ciudad=codciudad
+where nomciudad like '%asto%' and sexestudiante='F'
+union 
+select 'Hombres' as sexo, round(avg(edaestudiante)) as nedad
+from estudiantes join ciudades on ciudad=codciudad
+where nomciudad like '%asto%' and sexestudiante='M'
+union
+select 'Total' as sexo, round(avg(edaestudiante)) as nedad
+from estudiantes join ciudades on ciudad=codciudad
+where nomciudad like '%asto%';
+---------------
+-- MAX(<attri>) y min(<attri>): Permiten obtener el valor maximo y el valor minimo
+-- de un atributo numerico.
+---------------
+-- Visualizar cual fue la nota maxima y la nota minima de los estudiantes de ing de sistemas 
+-- en la materia bases de datos.
+select 'Maximo' as category, max(nfinal) as value 
+from estudiantes join regnotas on codestudiante=estudiante
+	join materias on materia=codmateria join programas on programa=codprograma
+where nommateria like '%ase%atos%' and nomprograma like '%istem%'
+union
+select 'Minimo' as category, min(nfinal) as value 
+from estudiantes join regnotas on codestudiante=estudiante
+	join materias on materia=codmateria join programas on programa=codprograma
+where nommateria like '%ase%atos%' and nomprograma like '%istem%';
+----
+-- visalizar el numero de estudiantes , la nota promedio, la nota maxima y la nota minima
+-- del programa de ing sistemas
+select count(distinct estudiante) as num_estu, round(avg(nfinal), 2) as nfinal, max(nfinal) as maximo, min(nfinal) as minimo
+from estudiantes join programas on programa=codprograma 
+	join regnotas on codestudiante=estudiante
+where nomprograma like '%istem%';
+-------------------------
+-- Agrupamiento con funciones agregadas
+-------------------------
+/*
+ * GROUP BY(<attr>) permite obtener 
+ * Todo atributo que este acompañado de una funciona agregada debe ir 
+ * en la clausula group by y no viceversa, es decir, todo atributo 
+ * que va en el group by no necesariamente debe estar en selest
+ */
+-- 
+select nomprograma, round(avg(nfinal), 2)
+from estudiantes join programas on programa=codprograma
+	join regnotas on codestudiante=estudiante
+group by nomprograma;
+--
+--visualizar el numero de estudiantes, la nota promedio, la nota maxima y la nota minima por programa
+-- ordenados por nota promedio dese
+select nomprograma, count(distinct codestudiante) as num_estu, round(avg(nfinal), 2) as n_promedio, max(nfinal) as maximo, min(nfinal) as minimo
+from estudiantes join programas on programa=codprograma 
+	join regnotas on codestudiante=estudiante
+group by nomprograma
+order by 1 desc;
+----
+--visualizar el numero de estudiantes, la nota promedio, la nota maxima y la nota minima por programa y sexo
+-- ordenados por nota promedio dese
+select nomprograma, sexestudiante as sexo, count(distinct codestudiante) as num_estu, round(avg(nfinal), 2) as n_promedio, max(nfinal) as maximo, min(nfinal) as minimo
+from estudiantes join programas on programa=codprograma 
+	join regnotas on codestudiante=estudiante
+group by nomprograma, sexo
+order by 1,2 desc;
