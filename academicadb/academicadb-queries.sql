@@ -418,3 +418,10 @@ from estudiantes join programas on programa=codprograma
 	join regnotas on codestudiante=estudiante
 group by nomprograma, sexo
 order by 1,2 desc;
+----
+-- VIsualizar el numero de estudiantes y su porcentaje de aquellos
+-- que aporbaron y reprobaron bases de datos.
+-- discriminados(agrupado) por sexo.
+
+-- enviar a siritiper@gmail.com hasta las 12 de la noche en pdf(resultado y orden)
+select estado, 
