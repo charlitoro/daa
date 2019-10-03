@@ -393,7 +393,7 @@ where nomprograma like '%istem%';
 -------------------------
 /*
  * GROUP BY(<attr>) permite obtener 
- * Todo atributo que este acompañado de una funciona agregada debe ir 
+ * Todo atributo que este acompaï¿½ado de una funciona agregada debe ir 
  * en la clausula group by y no viceversa, es decir, todo atributo 
  * que va en el group by no necesariamente debe estar en selest
  */
@@ -420,8 +420,17 @@ group by nomprograma, sexo
 order by 1,2 desc;
 ----
 -- VIsualizar el numero de estudiantes y su porcentaje de aquellos
--- que aporbaron y reprobaron bases de datos.
+-- que aprobaron y reprobaron bases de datos.
 -- discriminados(agrupado) por sexo.
 
 -- enviar a siritiper@gmail.com hasta las 12 de la noche en pdf(resultado y orden)
-select estado, 
+select estado, sexestudiante, count(*) num_est, 
+		count(*)*100/(select count(*) 
+					from estudiantes join regnotas on codestudiante=estudiante 
+						join materias on materia=codmateria 
+					where nommateria like '%ase%atos%') as porcent
+from estudiantes join regnotas on codestudiante=estudiante
+	join materias on materia=codmateria
+where nommateria like '%ase%atos%'
+group by estado, sexestudiante; 
+
