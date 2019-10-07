@@ -65,3 +65,7 @@ Son funciones muy utilizadas para la estadistica, que nos permite realizar conte
 * __avg(\<attribute>)__: Obtiene el valor promedio del atributo numerico.
 * __max(\<attribute>)__: Obtiene el valor maximo del atributo numerico.
 * __min(\<attribute>)__: Obtiene el valor minimo del atributo numerico.
+
+## Restricciones en funciones agregadas
+
+Son restricciones sobre las funciones agregadas y esta ba en la clausula HAVING \<restriction\>

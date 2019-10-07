@@ -424,4 +424,72 @@ order by 1,2 desc;
 -- discriminados(agrupado) por sexo.
 
 -- enviar a siritiper@gmail.com hasta las 12 de la noche en pdf(resultado y orden)
-select estado, 
+
+-- HACER PULL A MASTE PARA ACTUALIZAR
+
+-- Soucion con redondeo
+select sexestudiante, estado, count(*), 
+round((count(*)*100/(select count(*) 
+	from estudiantes join regnotas on codestudiante=estudiante join materias on materia=codmateria
+	where nommateria like '%ase%atos%')::numeric), 2) as porcentaje
+from estudiantes join regnotas on codestudiante=estudiante join materias on materia=codmateria
+where nommateria like '%ase%atos%'
+group by sexestudiante, estado;
+
+--===================================
+-- RESTRICCIONES EN FUNCIONES AGREGADAS
+--===================================
+----
+-- Visualizar las ciudades cuyo numero de estudiantes sea mayor que 45, ordenados
+-- por numero de estudiantes desecendentemente
+select nomciudad as ciudad, count(*) as num_estudiantes
+from ciudades join estudiantes on codciudad=ciudad
+group by 1
+having count(*)>45
+order by 2 desc;
+----
+-- Visualizar los estudiantes de ingenieria cuya nota promedio sea menor que la
+-- nota promedio del programa de ingneieria de sistemas
+select round(avg(nfinal),2) 
+from programas join estudiantes on codprograma=programa
+		join regnotas on codestudiante=estudiante
+where nomprograma like '%istem%';
+-- resultado 2.93
+select nomestudiante,round(avg(nfinal),2) as promedio
+from programas join estudiantes on codprograma=programa
+		join regnotas on codestudiante=estudiante
+where nomprograma like '%istem%'
+group by nomestudiante
+having round(avg(nfinal), 2) < (select round(avg(nfinal),2) 
+		from programas join estudiantes on codprograma=programa
+			join regnotas on codestudiante=estudiante
+		where nomprograma like '%istem%')
+;		
+-- visualizar el numero de estudiantes y de nota promedio de aquellos programas
+-- cuyo numero de estudiantes es mayor que 15 y la nota promedio mayor que 2.9
+-- ordenado por numero de estudiantes
+select nomprograma, count(*) as nestudoantes, round(avg(nfinal),2) as promedio
+from programas join estudiantes on codprograma=programa
+		join regnotas on codestudiante=estudiante
+group by 1
+having count(*) > 15 and round(avg(nfinal),2) > 2.9
+order by 2 desc;
+----
+-- Visualizar las materias cuya nota promedio es mayor que
+-- la nota promedio de la materia bases de datos
+-- ordenado por nota promedio desendente.
+select nommateria as materia,
+round(avg(nfinal),2) as promedio 
+from regnotas join materias on materia=codmateria
+group by 1
+having round(avg(nfinal)) > (select round(avg(nfinal),2) from regnotas join materias on materia=codmateria where nommateria like '%ase%ato%')
+order by 2 desc;
+--============================
+-- ANIDAMIENTO DE FUCIONES AGREFADAS
+--============================
+----
+-- Visualizar cual programa tiene la mayor nota promedio
+select nommateria, round(avg(nfinal)) as promedio
+from  regnotas join materias on materia=codmateria
+group by 1
+;
