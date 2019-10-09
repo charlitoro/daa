@@ -424,9 +424,16 @@ order by 1,2 desc;
 -- discriminados(agrupado) por sexo.
 
 -- enviar a siritiper@gmail.com hasta las 12 de la noche en pdf(resultado y orden)
-<<<<<<< HEAD
 
--- HACER PULL A MASTE PARA ACTUALIZAR
+select estado, sexestudiante, count(*) num_est, 
+		count(*)*100/(select count(*) 
+					from estudiantes join regnotas on codestudiante=estudiante 
+						join materias on materia=codmateria 
+					where nommateria like '%ase%atos%') as porcent
+from estudiantes join regnotas on codestudiante=estudiante
+	join materias on materia=codmateria
+where nommateria like '%ase%atos%'
+group by estado, sexestudiante; 
 
 -- Soucion con redondeo
 select sexestudiante, estado, count(*), 
@@ -494,15 +501,5 @@ select nommateria, round(avg(nfinal)) as promedio
 from  regnotas join materias on materia=codmateria
 group by 1
 ;
-=======
-select estado, sexestudiante, count(*) num_est, 
-		count(*)*100/(select count(*) 
-					from estudiantes join regnotas on codestudiante=estudiante 
-						join materias on materia=codmateria 
-					where nommateria like '%ase%atos%') as porcent
-from estudiantes join regnotas on codestudiante=estudiante
-	join materias on materia=codmateria
-where nommateria like '%ase%atos%'
-group by estado, sexestudiante; 
 
->>>>>>> 4a11b65367dd0eafddaf45cbbba5ee661ea7c28d
+
