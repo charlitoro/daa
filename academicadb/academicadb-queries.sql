@@ -499,7 +499,32 @@ order by 2 desc;
 -- Visualizar cual programa tiene la mayor nota promedio
 select nommateria, round(avg(nfinal)) as promedio
 from  regnotas join materias on materia=codmateria
+group by 1;
+----
+-- Visualizar cuales estudiantes de ingenieria de sisemas 
+-- tienen la menor nota promedio ordenados alfabeticamente
+select nomestudiante, round(avg(nfinal),2) as promedio
+from estudiantes join programas on programa=codprograma
+join regnotas on codestudiante=estudiante
+where nomprograma like '%istem%'
 group by 1
-;
+having round(avg(nfinal),2)= (select min(t1.promedio)from (select nomestudiante, round(avg(nfinal),2) as promedio from estudiantes join programas on programa=codprograma
+join regnotas on codestudiante=estudiante 
+where nomprograma like '%istem%'
+group by 1) as t1);
+/*
+ * SUBQUERYS CON FUNCIONES AGREGADAS
+ */
+-- Visualizar cuales estudiantes de bases de datos tiene nota final
+-- mayor que la nota promedio de bases de datos, ordenado por nota final
+-- desendente
+----
+-- paso 1: Calcular la nota promedio 
+select round(avg(nfinal),2)
+from regnotas join materias on materia=codmateria
+where nommateria like '%ase%ato%';
+-- resultado 2.87
+-- Paso2: calcular los estudiantes y la nota final
+-- en bd es mayor que 2.87
 
 
