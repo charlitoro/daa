@@ -513,7 +513,7 @@ join regnotas on codestudiante=estudiante
 where nomprograma like '%istem%'
 group by 1) as t1);
 /*
- * SUBQUERYS CON FUNCIONES AGREGADAS
+ * SUBQUERIES CON FUNCIONES AGREGADAS
  */
 -- Visualizar cuales estudiantes de bases de datos tiene nota final
 -- mayor que la nota promedio de bases de datos, ordenado por nota final
@@ -526,5 +526,219 @@ where nommateria like '%ase%ato%';
 -- resultado 2.87
 -- Paso2: calcular los estudiantes y la nota final
 -- en bd es mayor que 2.87
+select nomestudiante,nommateria,nfinal
+from regnotas join materias on materia=codmateria 
+		join estudiantes on estudiante=codestudiante
+where  nommateria like '%ase%ato%'and 
+		nfinal>(2.87)
+order by 3 desc;
+-- paso final. Reemplazar 2.87 por la orden que lo genero 
+select  nomestudiante,nommateria,nfinal
+from regnotas join materias on materia=codmateria 
+	join estudiantes on estudiante=codestudiante
+where  nommateria like '%ase%ato%' and 
+		nfinal >(select round(avg(nfinal),2)
+					from regnotas join materias on materia=codmateria
+					where nommateria like '%ase%ato%')
+order by 3 desc;
+--
+----------------------------------------------------------------
+-- Visualizar la nota promedio de los estudiantes de Ingenieria 
+-- de Sistemas que no matricularon la materia base de datos
+---- 
+-- 1 forma:left join
+-- paso 1. Visualizar todos los estudiantes de Ingenieria de Sistemas
+-- que no matricularon base de datos
+select nomestudiante,nomprograma,nommateria
+from 	(estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+	left join 
+		(regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
+	on codestudiante=estudiante
+where nommateria is null
+order by 3;
+--
+-- paso final. Calcular la nota promedio de estos estudiantes
+select round(avg(nfinal),2) as promedio
+from (	select codestudiante,nomestudiante,nomprograma,nommateria
+		from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+		left join
+			(regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
+		on codestudiante=estudiante 
+		where nommateria is null) t1 
+	join regnotas on t1.codestudiante=estudiante;
+----
+-- Visualizar cuales estudiantes de Ingenieria de Sistemas que no matricularon
+-- bases de datos tienen su nota promedio mayor que la nota promedio de los estudiantes
+-- de Ingenieria de Sistemas que no matricularon bases de datos (en este caso 2.94).
 
+-- paso 1. Visualizar la nota final de cada estudiante de Ing. de Sistemas
+-- que no matricularon bases de datos.
+select t1.nomestudiante,nfinal
+from  (select codestudiante,nomestudiante,nomprograma,nommateria
+	   from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+	   	  left join
+	   	  	(regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
+		  on codestudiante=estudiante
+	   where nommateria is null) t1 
+	join regnotas on t1.codestudiante=estudiante
+order by 1;
+-- paso 2. Visualizar la nota promedio de cada estudiante de Ing. de Sistemas
+-- que no matricularon bases de datos.
+select  t2.nomestudiante,round(avg(nfinal),2) as promedio
+from (select t1.nomestudiante,nfinal
+	  from (select codestudiante,nomestudiante,nomprograma,nommateria
+			from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+			  left join
+				(regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
+			  on codestudiante=estudiante
+	  		where nommateria is null) t1 join regnotas on t1.codestudiante=estudiante) t2
+group by 1
+order by 1;
+-- paso 3. Visualizar los estudiantes que no matricularon base de datos cuya 
+-- nota promedio es mayor que 2.94
+select t2.nomestudiante,round(avg(t2.nfinal),2) as promedio
+from (select t1.nomestudiante,nfinal
+		from (select codestudiante,nomestudiante,nomprograma,nommateria
+			  from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+			    left join
+					(regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
+				on codestudiante=estudiante
+			  where nommateria is null) t1 
+		join regnotas on t1.codestudiante=estudiante) t2
+group by 1
+having round(avg(nfinal),2)>(2.94)
+order by 1;
+--------------------------------------------------------------------------------------
+-- paso final. Reemplazar el 2.94 por la orden que lo genero
+select  t2.nomestudiante,round(avg(t2.nfinal),2) as promedio
+from (select t1.nomestudiante,nfinal
+	  from  (select codestudiante,nomestudiante,nomprograma,nommateria
+             from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+				left join
+					(regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
+				on codestudiante=estudiante
+			 where nommateria is null) t1 
+	  join regnotas on t1.codestudiante=estudiante) t2
+group by 1
+having round(avg(nfinal),2) > (select round(avg(nfinal),2) as promedio
+								from (select codestudiante,nomestudiante,nomprograma,nommateria
+									  from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+										left join
+											(regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
+										on codestudiante=estudiante
+									  where nommateria is null) t1 
+								join regnotas on t1.codestudiante=estudiante)
+order by 1;
+--=========================================================================
+/*
+ * Visualizar cuales estudiantes de Ingenieria de Sistemas que no matricularon
+ * ni bases de datos ni  Telemática tienen su nota promedio menor que la nota promedio 
+ * de los estudiantes de Ingenieria de Sistemas que no matricularon 
+ * ni bases de datos ni telemática
+ * enviar a siritiper@gmail.com hasta el lunes 14 de octubre a las 6 pm.
+*/
+----
+-- Estudiantes de ingenieria de sistemas que no matricularon bases de datos y telematica
+select *
+from 
+		(select codestudiante,nomestudiante,nomprograma,nommateria
+		from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+			left join 
+			  (regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
+			on codestudiante=estudiante
+		where nommateria is null) as t1
+	join 
+		(select codestudiante,nomestudiante,nomprograma,nommateria
+		from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+			left join 
+			  (regnotas join materias on materia=codmateria and nommateria like '%elem_tic%')
+			on codestudiante=estudiante
+		where nommateria is null) as t2
+	on t1.codestudiante=t2.codestudiante;
+-- Visualizar la nota final de los estudiantes que no matriuclaron telematica ni bases de datos
+select t3.nomestudiante,nfinal
+from (select t1.codestudiante,t1.nomestudiante,t1.nomprograma
+	  from 
+		(select codestudiante,nomestudiante,nomprograma,nommateria
+		from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+			left join 
+			  (regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
+			on codestudiante=estudiante
+		where nommateria is null) as t1
+	  join 
+		(select codestudiante,nomestudiante,nomprograma,nommateria
+		from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+			left join 
+			  (regnotas join materias on materia=codmateria and nommateria like '%elem_tic%')
+			on codestudiante=estudiante
+		where nommateria is null) as t2
+	  on t1.codestudiante=t2.codestudiante) as t3
+	join 
+	  regnotas on estudiante=t3.codestudiante
+;
+-- Visualizar el promedio de nota de los estudiantes que no matricularon bases de datos ni telematica
+select t3.nomestudiante,round(avg(nfinal), 2)
+from (select t1.codestudiante,t1.nomestudiante,t1.nomprograma
+	  from 
+		(select codestudiante,nomestudiante,nomprograma,nommateria
+		from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+			left join 
+			  (regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
+			on codestudiante=estudiante
+		where nommateria is null) as t1
+	  join 
+		(select codestudiante,nomestudiante,nomprograma,nommateria
+		from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+			left join 
+			  (regnotas join materias on materia=codmateria and nommateria like '%elem_tic%')
+			on codestudiante=estudiante
+		where nommateria is null) as t2
+	  on t1.codestudiante=t2.codestudiante) as t3
+	join 
+	  regnotas on estudiante=t3.codestudiante
+group by 1;  
+	
+-- Paso final
+select t3.nomestudiante,round(avg(nfinal), 2)
+from (select t1.codestudiante,t1.nomestudiante,t1.nomprograma
+	  from 
+		(select codestudiante,nomestudiante,nomprograma,nommateria
+		from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+			left join 
+			  (regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
+			on codestudiante=estudiante
+		where nommateria is null) as t1
+	  join 
+		(select codestudiante,nomestudiante,nomprograma,nommateria
+		from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+			left join 
+			  (regnotas join materias on materia=codmateria and nommateria like '%elem_tic%')
+			on codestudiante=estudiante
+		where nommateria is null) as t2
+	  on t1.codestudiante=t2.codestudiante) as t3
+	join 
+	  regnotas on estudiante=t3.codestudiante
+group by 1
+having round(avg(nfinal),2) < 
+		(select round(avg(nfinal), 2)
+		from (select t1.codestudiante,t1.nomestudiante,t1.nomprograma
+			  from 
+				(select codestudiante,nomestudiante,nomprograma,nommateria
+				from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+					left join 
+					  (regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
+					on codestudiante=estudiante
+				where nommateria is null) as t1
+			  join 
+				(select codestudiante,nomestudiante,nomprograma,nommateria
+				from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+					left join 
+					  (regnotas join materias on materia=codmateria and nommateria like '%elem_tic%')
+					on codestudiante=estudiante
+				where nommateria is null) as t2
+			  on t1.codestudiante=t2.codestudiante) as t3
+		join 
+		  regnotas on estudiante=t3.codestudiante)
+order by 1;
+	
 
