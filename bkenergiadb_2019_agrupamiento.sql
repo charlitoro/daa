@@ -128,11 +128,11 @@ ALTER TABLE votaciones OWNER TO postgres;
 -- Data for Name: barrios; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('100', 'San Andrés', 3);
+INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('100', 'San Andrï¿½s', 3);
 INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('101', 'El Churo', 1);
 INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('102', 'Aire Libre', 2);
 INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('200', 'Atahualpa', 3);
-INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('201', 'Fátima', 2);
+INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('201', 'Fï¿½tima', 2);
 INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('202', 'Caicedonia', 1);
 INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('300', 'El Ejido', 1);
 INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('301', 'Los Pinos', 3);
@@ -154,7 +154,7 @@ INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('801', 'Mariluz',
 INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('802', 'Quintas de San Pedro', 4);
 INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('900', 'Morasurco', 6);
 INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('901', 'El Aljibe', 4);
-INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('902', 'Briceño', 6);
+INSERT INTO barrios (codigo_ba, nombre_ba, estrato_ba) VALUES ('902', 'Briceï¿½o', 6);
 
 
 --
@@ -533,7 +533,7 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 -- Realizar las siguientes consultas
 -- =========================================================================================================
 --
---   1. VISUALIZAR EL NÚMERO y PORCENTAJE DE LOS CIUDADANOS DE LOS ESTRATOS BAJOS  DE LOS PARTIDOS 
+--   1. VISUALIZAR EL Nï¿½MERO y PORCENTAJE DE LOS CIUDADANOS DE LOS ESTRATOS BAJOS  DE LOS PARTIDOS 
 --   CONSERVADOR, LIBERAL Y POLO DEMOCRATICO QUE VOTARON (votantes) y los que NO VOTARON (abstencionistas), totalizando los resultados y 
 --   ordenados por porcentaje descendentemente (2 PUNTOS)
 --   Se debe clasificar los ciudadanos de acuerdo a este criterio
@@ -547,7 +547,7 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 -- 3.Cuales fueron las MESAS con el mayor numero de ciudadanos votantes (1 punto)
 
 -- ======================================================================
--- 4.Cuales fueron los barrios con un alto número de votantes ORDENADOS POR BARRIO (1 punto)
+-- 4.Cuales fueron los barrios con un alto nï¿½mero de votantes ORDENADOS POR BARRIO (1 punto)
 -- alto >=4
 -- medio >=2 y < 4
 -- bajo <=1 
@@ -615,7 +615,7 @@ having  count(ciudadano_v) = (select max(t1.votos)
 						join votaciones on cedula_ciu=ciudadano_v
 					group by 1) t1);
 /*
- * 4.Cuales fueron los barrios con un alto número de 
+ * 4.Cuales fueron los barrios con un alto nï¿½mero de 
  * votantes ORDENADOS POR BARRIO (1 punto)
  * 
  * alto >=4
@@ -651,7 +651,7 @@ where t2.nivel='alto'
 order by 1;
 
 /*
-*1. VISUALIZAR EL NÚMERO y PORCENTAJE DE LOS CIUDADANOS DE LOS 
+*1. VISUALIZAR EL Nï¿½MERO y PORCENTAJE DE LOS CIUDADANOS DE LOS 
 *	ESTRATOS BAJOS  DE LOS PARTIDOS 
 *	CONSERVADOR, LIBERAL Y POLO DEMOCRATICO 
 *	QUE VOTARON (votantes) y los que NO VOTARON (abstencionistas), 
