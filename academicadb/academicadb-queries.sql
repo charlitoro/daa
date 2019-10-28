@@ -577,3 +577,72 @@ having round(avg(nfinal),2) <
 				regnotas on estudiante=t3.codestudiante)
 	order by 1;
 -->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+-- VISTAS
+---------
+create or replace view estu_is_bd as 
+select * 
+from programas join estudiantes on codprograma=programa join regnotas on codestudiante=estudiante
+	join materias on materia=codmateria
+where nomprograma like '%istem%' and
+		nommateria like '%ase%atos%';
+--------
+-- consulta de las vistas
+-- visualizar los estudiantes de Pasto de 
+-- sistemas que reprobaron bases de datos
+select nomestudiante,nomciudad,nommateria,nfinal,nomprograma
+from estu_is_bd join ciudades on ciudad=codciudad
+where nomciudad like '%asto%' and
+	estado = 'R'
+order by 1;
+----
+-- visualizar el nombre, sexo y edad y el programa de las estudiantes
+-- de ing de sistemas menores que 22 años que miran bases de datos 
+-- ordenados desendentemente por año.
+select nomestudiante,sexestudiante,edaestudiante,nomprograma
+from estu_is_bd
+where sexestudiante='F' and edaestudiante < 22 
+order by 3;
+----
+-- se actualiza el sexo del estudiante Daniel Toro
+update estudiantes set sexestudiante='M'
+where nomestudiante like 'Daniel%oro%';
+----
+create or replace view estu_is_tm as
+select nomestudiante as nombre,
+	nomprograma as programa,
+	nommateria as materia,
+	nfinal as final
+from estudiantes join programas on programa=codprograma
+	join regnotas on codestudiante=estudiante
+	join materias on materia=codmateria
+where nomprograma like '%istem%' and
+	nommateria like '%elem_ti%'
+order by 4 desc;
+----
+-- Eliminar una vista
+drop view estu_is_tm;
+----
+-- Corregir el error y ejecutar siempre y cuando 
+-- tenga la clausula replace-
+----
+select *
+from estu_is_tm;
+-----
+-- visualizar los estudiantes de ingenieria de sistemas que matricularon
+-- a la vez bases de datos y telematica
+select nomestudiante,sexestudiante
+from estu_is_bd join estu_is_tm on nomestudiante=nombre
+order by 2;
+-- con intersect 
+select nomestudiante,nomprograma
+from estu_is_bd 
+intersect 
+select nombre,programa
+from estu_is_tm
+order by 1;
+-----
+create or replace view estu_is_bdtm as 
+select t1.nomestudiante,t1.sexestudiante,t1.nomprograma,t1.nommateria
+from estu_is_bd as t1 join estu_is_tm as t2 on t1.nomestudiante=t2.nombre;
+----
+-- 
