@@ -645,4 +645,131 @@ create or replace view estu_is_bdtm as
 select t1.nomestudiante,t1.sexestudiante,t1.nomprograma,t1.nommateria
 from estu_is_bd as t1 join estu_is_tm as t2 on t1.nomestudiante=t2.nombre;
 ----
--- 
+--------------------------------------------------------------------------------------
+-- Creación de vistas con otras vistas
+--------------------------------------------------------------------------------------
+-- Crear una vista con los estudiantes de ingenieria de sistemas
+-- que matricularon a la vez base de datos y telemática
+create or replace view estu_is_bdtm as
+select t1.nomestudiante, t1.nomprograma, t1.nommateria,t2.materia
+from
+estu_is_bd t1 join estu_is_tm t2  on t1.nomestudiante=t2.nombre
+order by 1;
+--------------------------------------------------------------------------------------
+-- Visualizar los estudiantes de ingenieria de sistemas que matricularon materias
+-- pero no matricularon ni base de datos ni telematica
+--------------------------------------------------------------------------------------
+-- 1 forma
+select distinct  
+nomestudiante, nomprograma
+from 
+estudiantes join programas on programa=codprograma
+join regnotas on codestudiante=estudiante
+where nomprograma like '%istem%'
+except
+select nomestudiante, nomprograma
+from estu_is_bdtm 
+order by 1;
+-- 2 forma 
+select distinct  
+t1.nomestudiante, t1.nomprograma
+from 
+(estudiantes join programas on programa=codprograma
+join regnotas on codestudiante=estudiante and nomprograma like '%istem%') t1
+left join 
+estu_is_bdtm  t2 on t1.nomestudiante=t2.nomestudiante
+where
+t2.materia is null
+order by 1;
+--------------------------------------------------------------------------------------
+-- VISTAS CON AGRUPAMIENTO Y AGREGACIÓN
+--------------------------------------------------------------------------------------
+-- Visualizar la nota promedio de los estudiantes que matricularon a la vez
+-- base de datos y telematica
+select 
+t1.nomestudiante, round(avg(t3.nfinal),2) as promedio
+from
+estu_is_bdtm t1 join estudiantes t2 on t1.nomestudiante=t2.nomestudiante
+join regnotas t3 on t2.codestudiante=t3.estudiante
+group by 1
+order by 2 desc;
+--------------------------------------------------------------------------------------
+-- Visualizar los estudiantes de Ing. sistemas que matricularon a la vez
+-- base de datos y telematica y la nota promedio es mayor que la nota promedio
+-- de los estudiantes que matricularon base de datos y telematica
+-- ordenados por nota promedio
+--------------------------------------------------------------------------------------
+-- 1 paso: calular nota promedio de los estudiantes
+-- de ingenieris de sistemas que matricularon bases de datos
+-- y telematica 
+select round(avg(nfinal),2) as promedio
+from estu_is_bdtm t1 join estudiantes t2 on t1.nomestudiante=t2.nomestudiante
+	join regnotas t3 on t2.codestudiante=t3.estudiante
+	join programas t4 on t1.nomprograma=t4.nomprograma;
+-----
+-- Viisualizar los estudiantes con un promedio de nota mayor a 3.01
+select t1.nomestudiante, round(avg(nfinal),2) as promedio
+from estu_is_bdtm t1 join estudiantes t2 on t1.nomestudiante=t2.nomestudiante
+	join regnotas t3 on t2.codestudiante=t3.estudiante
+	join programas t4 on t1.nomprograma=t4.nomprograma
+group by 1 
+having round(avg(nfinal),2) > (select round(avg(nfinal),2) as promedio
+from estu_is_bdtm t1 join estudiantes t2 on t1.nomestudiante=t2.nomestudiante
+	join regnotas t3 on t2.codestudiante=t3.estudiante
+	join programas t4 on t1.nomprograma=t4.nomprograma);
+	
+---------
+-- SUBQUERIES EN CLAUSILA select
+---------
+-- Visualizar los estudiantes de la facultad de ingenieria 
+-- que matricularon materias pero que no matricularon
+-- bases de datos y telematica.
+select distinct nomestudiante,nomprograma,nomfacultad
+from facultades join programas on codfacultad=nomfacultad
+	join estudiantes on programa=codprograma
+	join regnotas on codestudiante=estudiante
+where nomfacultad like '%gen_er_a%' and 
+	codestudiante not in (select codestudiante 
+						  from estudiantes join regnotas on codestudiante=estudiante
+						  		join materias on materia=codmateria
+						  where nommateria like '%ase%ato%') and
+	codestudiante not in (select codestudiante 
+						  from estudiantes join regnotas on codestudiante=estudiante
+						  		join materias on materia=codmateria
+						  where nommateria like '%elem_tic%');
+--- visualizar loes estudiantes de ingenieria de sistemas
+-- cuya nota final en bases de datos es menor que la nota promedio
+-- que la materia bades de datos, ordenado por nota final.
+select nomestudiante,nommateria,nfinal,nomprograma
+from estudiantes join regnotas on codestudiante=estudiante
+join materias on materia=codmateria
+join programas on programa=codprograma
+where nomprograma like '%istem%' and 
+	nommateria like '%ase%ato%' and 
+	nfinal < (select round(avg(nfinal),2)
+				from regnotas join materias on materia=codmateria
+					where nommateria like '%ase%ato%')
+order by 3;
+
+-- clasficar a los estudiantes de ingenieria de sistemas que matricularon
+-- bases de datos en:
+--	Sobre la media
+--	Bajo la media
+-- en el caso que la nota final sea igual o mayor que la media respectivament
+-- ordenados por nfinal
+
+-- (1) promedio nfin al de bases de datos
+select round(avg(nfinal),2)
+from regnotas join materias on materia=codmateria
+where nommateria like '%ase%atos%';
+----
+select nomestudiante, nfinal, case when nfinal >= (select round(avg(nfinal),2)
+								from regnotas join materias on materia=codmateria
+								where nommateria like '%ase%atos%') then 'Sobre la media'
+							else 'Bajo la media' end as estado
+from estudiantes join regnotas on codestudiante=estudiante
+	join programas on programa=codprograma
+	join materias on materia=codmateria
+where nommateria like '%ase%atos%' and 
+		nomprograma like '%istem%'
+order by nfinal desc;
