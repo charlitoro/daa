@@ -773,3 +773,102 @@ from estudiantes join regnotas on codestudiante=estudiante
 where nommateria like '%ase%atos%' and 
 		nomprograma like '%istem%'
 order by nfinal desc;
+----------------------------------------
+-- SUBQUERIES O SUBCONSULTAS EN UPDATES
+----------------------------------------
+create table estadisticas as
+	select distinct nomestudiante as nombre from estudiantes
+	join regnotas on codestudiante=estudiante
+	order by 1;
+--
+alter table estadisticas add column npromedio decimal(4,2); 
+-- atualizar la nota promedio de cada estudiante 
+-- de la tabla estadiisticas
+update estadisticas set npromedio=(
+	select round(avg(nfinal), 2) 
+	from estudiantes join regnotas on codestudiante=estudiante and nombre=nomestudiante);
+--- 2 forma
+update estadisticas set npromedio=(
+	select round(avg(nfinal), 2) 
+	from estudiantes join regnotas on codestudiante=estudiante
+	where nomestudiante=nombre);
+----
+-- crear los atributos notamax,notamin, en la tabla estadisticas
+-- y actualizarlos por la nota minima y maxima de cada estudiante
+alter table estadisticas add column notamax decimal(3,1);
+alter table estadisticas add column notamin decimal(3,1);
+----
+update estadisticas set notamax=(
+	select max(nfinal) from estudiantes join regnotas on codestudiante=estudiante and nomestudiante=nombre),
+	notamin=(
+	select min(nfinal) from estudiantes join regnotas on codestudiante=estudiante and nomestudiante=nombre);
+----
+-- adicionar los atributos matmax y matmin a la tabla estadisticas 
+-- y actualizarlos con los nombres de las matieras donde cada estudiante
+-- obtuvo la nota maxima y la nota minima
+alter table estadisticas add column matmax varchar(30);
+alter table estadisticas add column matmin varchar(30);
+--
+update estadisticas set matmax=(
+	select nommateria from estudiantes join regnotas on codestudiante=estudiante
+		join materias on materia=codmateria and nomestudiante=nombre where nfinal=notamax limit 1),
+	matmin=(
+	select nommateria from estudiantes join regnotas on codestudiante=estudiante
+		join materias on materia=codmateria and nomestudiante=nombre where nfinal=notamin limit 1);
+----
+-- crear el atributo rendimiento y actualizarlo deacuerdo si esta por encima, igual
+-- o por debajo del promedio del programa al cual pertenece cada estudiante
+alter table estadisticas add column rendimiento varchar	(20);
+--
+update estadisticas set rendimiento=(
+	select case when npromedio > (select round(avg(nfinal),2)
+										 from programas join estudiantes on codprograma=programa
+										 	join regnotas on estudiante=codestudiante
+										 where nomprograma=(select nomprograma 
+										 					from programas join estudiantes on codprograma=programa and nomestudiante=nombre)
+										 )
+		   		then 'Encima de la media'
+		   		when npromedio < (select round(avg(nfinal),2)
+										 from programas join estudiantes on codprograma=programa
+										 	join regnotas on estudiante=codestudiante
+										 where nomprograma=(select nomprograma 
+										 					from programas join estudiantes on codprograma=programa and nomestudiante=nombre)
+										 )
+		   		then 'Debajo de la media'
+		   		else 'Igual que la media' end);
+-----
+-- adicionar los atributos estprograma y programa a la tabla
+-- estadisticas y actualizar con el programa y la nota promedio del programa
+-- al cual pertenece cada estudiante
+--
+alter table estadisticas add column estprograma varchar(30);
+alter table estadisticas add column promprograma decimal(4,2);
+---
+update estadisticas set estprograma=(
+	select nomprograma from programas join 
+	estudiantes on codprograma=programa and
+	nomestudiante=nombre);
+--
+update estadisticas set promprograma=(
+	select round(avg(nfinal), 2) 
+	from programas join 
+		estudiantes on codprograma=programa join regnotas on codestudiante=estudiante 
+	where nomprograma=estprograma);
+----
+-- adicionar el atributi sumpromedios y actulizarlo con 
+-- la suma de los promedios de la facultad y de la ciudad
+-- a la cual pertence el estudiante
+alter table estadisticas add column sumpromedios numeric(4,2);
+--
+update esadisticas set sumapromedios=((
+	select round(avg(nfinal),2)
+	from regnotas join estudiantes on estudiante=codestudiante
+		join programa on programa=codprograma
+		join facultades on facultad=codfacultad
+		and nomestudiante=nombre) +
+	(select round(avg(nfinal),2)
+	from regnotas join estudiantes on estudiante=codestudiante
+		join ciudades on ciudad=codciudad
+		and nomestudiante=nombre))
+;
+	
