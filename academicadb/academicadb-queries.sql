@@ -531,9 +531,9 @@ where nommateria like '%ase%ato%';
 -->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 /*
 * Visualizar cuales estudiantes de Ingenieria de Sistemas que no matricularon
-* ni bases de datos ni Telemática tienen su nota promedio menor que la nota promedio
+* ni bases de datos ni Telemï¿½tica tienen su nota promedio menor que la nota promedio
 * de los estudiantes de Ingenieria de Sistemas que no matricularon
-* ni bases de datos ni telemática
+* ni bases de datos ni telemï¿½tica
 * enviar a siritiper@gmail.com hasta el lunes 14 de octubre a las 6 pm.
 */
 -- Paso final
@@ -596,8 +596,8 @@ where nomciudad like '%asto%' and
 order by 1;
 ----
 -- visualizar el nombre, sexo y edad y el programa de las estudiantes
--- de ing de sistemas menores que 22 años que miran bases de datos 
--- ordenados desendentemente por año.
+-- de ing de sistemas menores que 22 aï¿½os que miran bases de datos 
+-- ordenados desendentemente por aï¿½o.
 select nomestudiante,sexestudiante,edaestudiante,nomprograma
 from estu_is_bd
 where sexestudiante='F' and edaestudiante < 22 
@@ -646,10 +646,10 @@ select t1.nomestudiante,t1.sexestudiante,t1.nomprograma,t1.nommateria
 from estu_is_bd as t1 join estu_is_tm as t2 on t1.nomestudiante=t2.nombre;
 ----
 --------------------------------------------------------------------------------------
--- Creación de vistas con otras vistas
+-- Creaciï¿½n de vistas con otras vistas
 --------------------------------------------------------------------------------------
 -- Crear una vista con los estudiantes de ingenieria de sistemas
--- que matricularon a la vez base de datos y telemática
+-- que matricularon a la vez base de datos y telemï¿½tica
 create or replace view estu_is_bdtm as
 select t1.nomestudiante, t1.nomprograma, t1.nommateria,t2.materia
 from
@@ -682,7 +682,7 @@ where
 t2.materia is null
 order by 1;
 --------------------------------------------------------------------------------------
--- VISTAS CON AGRUPAMIENTO Y AGREGACIÓN
+-- VISTAS CON AGRUPAMIENTO Y AGREGACIï¿½N
 --------------------------------------------------------------------------------------
 -- Visualizar la nota promedio de los estudiantes que matricularon a la vez
 -- base de datos y telematica
