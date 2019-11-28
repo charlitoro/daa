@@ -69,3 +69,10 @@ Son funciones muy utilizadas para la estadistica, que nos permite realizar conte
 ## Restricciones en funciones agregadas
 
 Son restricciones sobre las funciones agregadas y esta ba en la clausula HAVING \<restriction\>
+
+## Vistas
+Rs una consulta que se mantiene como ojeto de la base de datos y que se comporta como si fuera una tabla.
+Una vista permite realizar consultas deacuerdo al codigo con la que se la definio, pero no permite ni insercion, actualizacion
+Puede estar compuesta por una o varias tablas.
+Una vista entonces es realente una tabla virtual.
+Los valores de una vista se actializan cuando se actualizan los datos en las tablas que la generaron 

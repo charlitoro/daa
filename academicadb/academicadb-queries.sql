@@ -571,6 +571,7 @@ from (	select codestudiante,nomestudiante,nomprograma,nommateria
 -- bases de datos tienen su nota promedio mayor que la nota promedio de los estudiantes
 -- de Ingenieria de Sistemas que no matricularon bases de datos (en este caso 2.94).
 
+<<<<<<< HEAD
 -- paso 1. Visualizar la nota final de cada estudiante de Ing. de Sistemas
 -- que no matricularon bases de datos.
 select t1.nomestudiante,nfinal
@@ -586,6 +587,20 @@ order by 1;
 -- que no matricularon bases de datos.
 select  t2.nomestudiante,round(avg(nfinal),2) as promedio
 from (select t1.nomestudiante,nfinal
+=======
+
+-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+/*
+* Visualizar cuales estudiantes de Ingenieria de Sistemas que no matricularon
+* ni bases de datos ni Telem�tica tienen su nota promedio menor que la nota promedio
+* de los estudiantes de Ingenieria de Sistemas que no matricularon
+* ni bases de datos ni telem�tica
+* enviar a siritiper@gmail.com hasta el lunes 14 de octubre a las 6 pm.
+*/
+-- Paso final
+select t3.nomestudiante,round(avg(nfinal), 2)
+from (select t1.codestudiante,t1.nomestudiante,t1.nomprograma
+>>>>>>> 6123d85a5c670995cf47589b9511f18f9f77a9f4
 	  from (select codestudiante,nomestudiante,nomprograma,nommateria
 			from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
 			  left join
@@ -722,21 +737,316 @@ group by 1
 having round(avg(nfinal),2) < 
 		(select round(avg(nfinal), 2)
 		from (select t1.codestudiante,t1.nomestudiante,t1.nomprograma
-			  from 
-				(select codestudiante,nomestudiante,nomprograma,nommateria
-				from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
-					left join 
-					  (regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
-					on codestudiante=estudiante
-				where nommateria is null) as t1
-			  join 
-				(select codestudiante,nomestudiante,nomprograma,nommateria
-				from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
-					left join 
-					  (regnotas join materias on materia=codmateria and nommateria like '%elem_tic%')
-					on codestudiante=estudiante
-				where nommateria is null) as t2
-			  on t1.codestudiante=t2.codestudiante) as t3
-		join 
-		  regnotas on estudiante=t3.codestudiante)
+			  from (select codestudiante,nomestudiante,nomprograma,nommateria
+					from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+						left join
+							(regnotas join materias on materia=codmateria and nommateria like '%ase%ato%')
+						on codestudiante=estudiante
+					where nommateria is null) as t1
+				join
+					(select codestudiante,nomestudiante,nomprograma,nommateria
+					 from (estudiantes join programas on programa=codprograma and nomprograma like '%istem%')
+						left join
+							(regnotas join materias on materia=codmateria and nommateria like '%elem_tic%')
+						on codestudiante=estudiante
+					where nommateria is null) as t2
+				on t1.codestudiante=t2.codestudiante) as t3
+			join
+				regnotas on estudiante=t3.codestudiante)
+	order by 1;
+-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+-- VISTAS
+---------
+create or replace view estu_is_bd as 
+select * 
+from programas join estudiantes on codprograma=programa join regnotas on codestudiante=estudiante
+	join materias on materia=codmateria
+where nomprograma like '%istem%' and
+		nommateria like '%ase%atos%';
+--------
+-- consulta de las vistas
+-- visualizar los estudiantes de Pasto de 
+-- sistemas que reprobaron bases de datos
+select nomestudiante,nomciudad,nommateria,nfinal,nomprograma
+from estu_is_bd join ciudades on ciudad=codciudad
+where nomciudad like '%asto%' and
+	estado = 'R'
 order by 1;
+----
+-- visualizar el nombre, sexo y edad y el programa de las estudiantes
+-- de ing de sistemas menores que 22 a�os que miran bases de datos 
+-- ordenados desendentemente por a�o.
+select nomestudiante,sexestudiante,edaestudiante,nomprograma
+from estu_is_bd
+where sexestudiante='F' and edaestudiante < 22 
+order by 3;
+----
+-- se actualiza el sexo del estudiante Daniel Toro
+update estudiantes set sexestudiante='M'
+where nomestudiante like 'Daniel%oro%';
+----
+create or replace view estu_is_tm as
+select nomestudiante as nombre,
+	nomprograma as programa,
+	nommateria as materia,
+	nfinal as final
+from estudiantes join programas on programa=codprograma
+	join regnotas on codestudiante=estudiante
+	join materias on materia=codmateria
+where nomprograma like '%istem%' and
+	nommateria like '%elem_ti%'
+order by 4 desc;
+----
+-- Eliminar una vista
+drop view estu_is_tm;
+----
+-- Corregir el error y ejecutar siempre y cuando 
+-- tenga la clausula replace-
+----
+select *
+from estu_is_tm;
+-----
+-- visualizar los estudiantes de ingenieria de sistemas que matricularon
+-- a la vez bases de datos y telematica
+select nomestudiante,sexestudiante
+from estu_is_bd join estu_is_tm on nomestudiante=nombre
+order by 2;
+-- con intersect 
+select nomestudiante,nomprograma
+from estu_is_bd 
+intersect 
+select nombre,programa
+from estu_is_tm
+order by 1;
+-----
+create or replace view estu_is_bdtm as 
+select t1.nomestudiante,t1.sexestudiante,t1.nomprograma,t1.nommateria
+from estu_is_bd as t1 join estu_is_tm as t2 on t1.nomestudiante=t2.nombre;
+----
+--------------------------------------------------------------------------------------
+-- Creaci�n de vistas con otras vistas
+--------------------------------------------------------------------------------------
+-- Crear una vista con los estudiantes de ingenieria de sistemas
+-- que matricularon a la vez base de datos y telem�tica
+create or replace view estu_is_bdtm as
+select t1.nomestudiante, t1.nomprograma, t1.nommateria,t2.materia
+from
+estu_is_bd t1 join estu_is_tm t2  on t1.nomestudiante=t2.nombre
+order by 1;
+--------------------------------------------------------------------------------------
+-- Visualizar los estudiantes de ingenieria de sistemas que matricularon materias
+-- pero no matricularon ni base de datos ni telematica
+--------------------------------------------------------------------------------------
+-- 1 forma
+select distinct  
+nomestudiante, nomprograma
+from 
+estudiantes join programas on programa=codprograma
+join regnotas on codestudiante=estudiante
+where nomprograma like '%istem%'
+except
+select nomestudiante, nomprograma
+from estu_is_bdtm 
+order by 1;
+-- 2 forma 
+select distinct  
+t1.nomestudiante, t1.nomprograma
+from 
+(estudiantes join programas on programa=codprograma
+join regnotas on codestudiante=estudiante and nomprograma like '%istem%') t1
+left join 
+estu_is_bdtm  t2 on t1.nomestudiante=t2.nomestudiante
+where
+t2.materia is null
+order by 1;
+--------------------------------------------------------------------------------------
+-- VISTAS CON AGRUPAMIENTO Y AGREGACI�N
+--------------------------------------------------------------------------------------
+-- Visualizar la nota promedio de los estudiantes que matricularon a la vez
+-- base de datos y telematica
+select 
+t1.nomestudiante, round(avg(t3.nfinal),2) as promedio
+from
+estu_is_bdtm t1 join estudiantes t2 on t1.nomestudiante=t2.nomestudiante
+join regnotas t3 on t2.codestudiante=t3.estudiante
+group by 1
+order by 2 desc;
+--------------------------------------------------------------------------------------
+-- Visualizar los estudiantes de Ing. sistemas que matricularon a la vez
+-- base de datos y telematica y la nota promedio es mayor que la nota promedio
+-- de los estudiantes que matricularon base de datos y telematica
+-- ordenados por nota promedio
+--------------------------------------------------------------------------------------
+-- 1 paso: calular nota promedio de los estudiantes
+-- de ingenieris de sistemas que matricularon bases de datos
+-- y telematica 
+select round(avg(nfinal),2) as promedio
+from estu_is_bdtm t1 join estudiantes t2 on t1.nomestudiante=t2.nomestudiante
+	join regnotas t3 on t2.codestudiante=t3.estudiante
+	join programas t4 on t1.nomprograma=t4.nomprograma;
+-----
+-- Viisualizar los estudiantes con un promedio de nota mayor a 3.01
+select t1.nomestudiante, round(avg(nfinal),2) as promedio
+from estu_is_bdtm t1 join estudiantes t2 on t1.nomestudiante=t2.nomestudiante
+	join regnotas t3 on t2.codestudiante=t3.estudiante
+	join programas t4 on t1.nomprograma=t4.nomprograma
+group by 1 
+having round(avg(nfinal),2) > (select round(avg(nfinal),2) as promedio
+from estu_is_bdtm t1 join estudiantes t2 on t1.nomestudiante=t2.nomestudiante
+	join regnotas t3 on t2.codestudiante=t3.estudiante
+	join programas t4 on t1.nomprograma=t4.nomprograma);
+	
+---------
+-- SUBQUERIES EN CLAUSILA select
+---------
+-- Visualizar los estudiantes de la facultad de ingenieria 
+-- que matricularon materias pero que no matricularon
+-- bases de datos y telematica.
+select distinct nomestudiante,nomprograma,nomfacultad
+from facultades join programas on codfacultad=nomfacultad
+	join estudiantes on programa=codprograma
+	join regnotas on codestudiante=estudiante
+where nomfacultad like '%gen_er_a%' and 
+	codestudiante not in (select codestudiante 
+						  from estudiantes join regnotas on codestudiante=estudiante
+						  		join materias on materia=codmateria
+						  where nommateria like '%ase%ato%') and
+	codestudiante not in (select codestudiante 
+						  from estudiantes join regnotas on codestudiante=estudiante
+						  		join materias on materia=codmateria
+						  where nommateria like '%elem_tic%');
+--- visualizar loes estudiantes de ingenieria de sistemas
+-- cuya nota final en bases de datos es menor que la nota promedio
+-- que la materia bades de datos, ordenado por nota final.
+select nomestudiante,nommateria,nfinal,nomprograma
+from estudiantes join regnotas on codestudiante=estudiante
+join materias on materia=codmateria
+join programas on programa=codprograma
+where nomprograma like '%istem%' and 
+	nommateria like '%ase%ato%' and 
+	nfinal < (select round(avg(nfinal),2)
+				from regnotas join materias on materia=codmateria
+					where nommateria like '%ase%ato%')
+order by 3;
+
+-- clasficar a los estudiantes de ingenieria de sistemas que matricularon
+-- bases de datos en:
+--	Sobre la media
+--	Bajo la media
+-- en el caso que la nota final sea igual o mayor que la media respectivament
+-- ordenados por nfinal
+
+-- (1) promedio nfin al de bases de datos
+select round(avg(nfinal),2)
+from regnotas join materias on materia=codmateria
+where nommateria like '%ase%atos%';
+----
+select nomestudiante, nfinal, case when nfinal >= (select round(avg(nfinal),2)
+								from regnotas join materias on materia=codmateria
+								where nommateria like '%ase%atos%') then 'Sobre la media'
+							else 'Bajo la media' end as estado
+from estudiantes join regnotas on codestudiante=estudiante
+	join programas on programa=codprograma
+	join materias on materia=codmateria
+where nommateria like '%ase%atos%' and 
+		nomprograma like '%istem%'
+order by nfinal desc;
+----------------------------------------
+-- SUBQUERIES O SUBCONSULTAS EN UPDATES
+----------------------------------------
+create table estadisticas as
+	select distinct nomestudiante as nombre from estudiantes
+	join regnotas on codestudiante=estudiante
+	order by 1;
+--
+alter table estadisticas add column npromedio decimal(4,2); 
+-- atualizar la nota promedio de cada estudiante 
+-- de la tabla estadiisticas
+update estadisticas set npromedio=(
+	select round(avg(nfinal), 2) 
+	from estudiantes join regnotas on codestudiante=estudiante and nombre=nomestudiante);
+--- 2 forma
+update estadisticas set npromedio=(
+	select round(avg(nfinal), 2) 
+	from estudiantes join regnotas on codestudiante=estudiante
+	where nomestudiante=nombre);
+----
+-- crear los atributos notamax,notamin, en la tabla estadisticas
+-- y actualizarlos por la nota minima y maxima de cada estudiante
+alter table estadisticas add column notamax decimal(3,1);
+alter table estadisticas add column notamin decimal(3,1);
+----
+update estadisticas set notamax=(
+	select max(nfinal) from estudiantes join regnotas on codestudiante=estudiante and nomestudiante=nombre),
+	notamin=(
+	select min(nfinal) from estudiantes join regnotas on codestudiante=estudiante and nomestudiante=nombre);
+----
+-- adicionar los atributos matmax y matmin a la tabla estadisticas 
+-- y actualizarlos con los nombres de las matieras donde cada estudiante
+-- obtuvo la nota maxima y la nota minima
+alter table estadisticas add column matmax varchar(30);
+alter table estadisticas add column matmin varchar(30);
+--
+update estadisticas set matmax=(
+	select nommateria from estudiantes join regnotas on codestudiante=estudiante
+		join materias on materia=codmateria and nomestudiante=nombre where nfinal=notamax limit 1),
+	matmin=(
+	select nommateria from estudiantes join regnotas on codestudiante=estudiante
+		join materias on materia=codmateria and nomestudiante=nombre where nfinal=notamin limit 1);
+----
+-- crear el atributo rendimiento y actualizarlo deacuerdo si esta por encima, igual
+-- o por debajo del promedio del programa al cual pertenece cada estudiante
+alter table estadisticas add column rendimiento varchar	(20);
+--
+update estadisticas set rendimiento=(
+	select case when npromedio > (select round(avg(nfinal),2)
+										 from programas join estudiantes on codprograma=programa
+										 	join regnotas on estudiante=codestudiante
+										 where nomprograma=(select nomprograma 
+										 					from programas join estudiantes on codprograma=programa and nomestudiante=nombre)
+										 )
+		   		then 'Encima de la media'
+		   		when npromedio < (select round(avg(nfinal),2)
+										 from programas join estudiantes on codprograma=programa
+										 	join regnotas on estudiante=codestudiante
+										 where nomprograma=(select nomprograma 
+										 					from programas join estudiantes on codprograma=programa and nomestudiante=nombre)
+										 )
+		   		then 'Debajo de la media'
+		   		else 'Igual que la media' end);
+-----
+-- adicionar los atributos estprograma y programa a la tabla
+-- estadisticas y actualizar con el programa y la nota promedio del programa
+-- al cual pertenece cada estudiante
+--
+alter table estadisticas add column estprograma varchar(30);
+alter table estadisticas add column promprograma decimal(4,2);
+---
+update estadisticas set estprograma=(
+	select nomprograma from programas join 
+	estudiantes on codprograma=programa and
+	nomestudiante=nombre);
+--
+update estadisticas set promprograma=(
+	select round(avg(nfinal), 2) 
+	from programas join 
+		estudiantes on codprograma=programa join regnotas on codestudiante=estudiante 
+	where nomprograma=estprograma);
+----
+-- adicionar el atributi sumpromedios y actulizarlo con 
+-- la suma de los promedios de la facultad y de la ciudad
+-- a la cual pertence el estudiante
+alter table estadisticas add column sumpromedios numeric(4,2);
+--
+update esadisticas set sumapromedios=((
+	select round(avg(nfinal),2)
+	from regnotas join estudiantes on estudiante=codestudiante
+		join programa on programa=codprograma
+		join facultades on facultad=codfacultad
+		and nomestudiante=nombre) +
+	(select round(avg(nfinal),2)
+	from regnotas join estudiantes on estudiante=codestudiante
+		join ciudades on ciudad=codciudad
+		and nomestudiante=nombre))
+;
+	
