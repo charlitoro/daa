@@ -1049,4 +1049,65 @@ update esadisticas set sumapromedios=((
 		join ciudades on ciudad=codciudad
 		and nomestudiante=nombre))
 ;
-	
+
+---------------------------
+-- CREACION DE REGLAS SOBRE VISTAS
+-------------------------
+---------
+-- ON INSERT
+---------
+create or replace view basicos_est as 
+select codestudiante as codigo,
+		nomestudiante as nombre,
+		sexestudiante as sexo ,
+		edaestudiante as edad
+from estudiantes join ciudades on ciudad=codciudad
+where nomciudad like 'Pasto';
+----
+create or replace rule insert_basicos_est as 
+on insert to basicos_est do instead 
+(insert into estudiantes(codestudiante,nomestudiante,sexestudiante,edaestudiante,barrio,ciudad,programa) 
+		values(new.codigo, new.nombre, new.sexo, new.edad,'101','52001','91'));
+---- test
+	insert into basicos_est values('6201', 'Alfonso Eraso', 'M', 30);
+---------
+-- ON UPDATE
+---------
+update basicos_est set edad=28 where codigo='6201';
+---
+create or replace rule update_basicos_est as
+on update to basicos_est
+do instead
+update estudiantes set 
+	codestudiante=new.codigo,
+	nomestudiante=new.nombre,
+	edaestudiante=new.edad,
+	sexestudiante=new.sexo
+where codestudiante=old.codigo;
+---
+update basicos_est set codigo='6210',nombre='Alfonsa Erazo',edad=26,sexo='F' where codigo='6201';
+--------
+-- ON DELETE
+--------
+delete from basicos_est where codigo='6210';
+---
+create or replace rule delete_basicos_est as 
+on delete to basicos_est 
+do instead 
+delete from estudiantes where codestudiante=old.codigo;
+---
+delete from basicos_est where codigo='6210';
+---------------------------------------------------------------------------
+-- REGLAS SOBRE TABLAS
+---------------------------------------------------------------------------
+----
+-- ON INSERT
+----
+create or replace rule inserta_notas as 
+on insert to regnotas
+do
+(update regnotas set nfinal=new.parcial1*0.30+new.parcial2*0.30+new.nfinal*0.40
+where estudiante = new.estudiante and materia=new.materia;
+---------------
+update regnotas set estado = case when nfinal >=3 then estado='A' else 'R' end 
+where estudiante = new.estudiante and materia=new.materia);

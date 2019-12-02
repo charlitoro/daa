@@ -71,8 +71,25 @@ Son funciones muy utilizadas para la estadistica, que nos permite realizar conte
 Son restricciones sobre las funciones agregadas y esta ba en la clausula HAVING \<restriction\>
 
 ## Vistas
+
 Rs una consulta que se mantiene como ojeto de la base de datos y que se comporta como si fuera una tabla.
 Una vista permite realizar consultas deacuerdo al codigo con la que se la definio, pero no permite ni insercion, actualizacion
 Puede estar compuesta por una o varias tablas.
 Una vista entonces es realente una tabla virtual.
-Los valores de una vista se actializan cuando se actualizan los datos en las tablas que la generaron 
+Los valores de una vista se actializan cuando se actualizan los datos en las tablas que la generaron
+
+## Reglas (Rules)
+
+Permiten realizar operaciones de insercion, eliminacion o atualizacion de dato, inmediatamente se produsca el evento que las llame. Las reglas son codigo sql ejecutable mediante los evetos:
+
+* on insert \<tabla>
+* on update \<tabla>
+* on delete \<tabla>
+
+Si la regla y el evento se ejecuta sobre una misma tabla entonces el evento deben ser diferente a la operacion que realiza la regla.
+Si la regla o el evento se ejecuta sobre diferentes \<tablas>
+entonces el evento y la operacion de la regla pueen ser iguales
+
+### Reglas sobre vistas
+
+Sobre la vista no es posible insertar in nuevo atrobutos, para solucionar este problema creamos una regla donde primero insertamos en la tabla de la cual se deriva la vista y esta se ejecutara entes de hacer el incert en la vista lo cual implic que ese valor ya existe y por tanto ya es posible insertar en la vista.
