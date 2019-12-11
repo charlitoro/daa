@@ -96,3 +96,6 @@ update posiciones set gd = gf-gc;
 update posiciones set gp = gf/pj;
 -- Puntos
 update posiciones set puntos = (pg*3)+pe;
+----------------------------------------------------
+-- RULES
+----------------------------------------------------
