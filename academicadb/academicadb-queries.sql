@@ -1104,10 +1104,9 @@ delete from basicos_est where codigo='6210';
 -- ON INSERT
 ----
 create or replace rule inserta_notas as 
-on insert to regnotas
-do
+on insert to regnotas do
 (update regnotas set nfinal=new.parcial1*0.30+new.parcial2*0.30+new.nfinal*0.40
 where estudiante = new.estudiante and materia=new.materia;
 ---------------
-update regnotas set estado = case when nfinal >=3 then estado='A' else 'R' end 
+update regnotas set estado = case when nfinal >=3 then 'A' else 'R' end 
 where estudiante = new.estudiante and materia=new.materia);
